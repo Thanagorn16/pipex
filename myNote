@@ -272,41 +272,42 @@
 * Simulating pipe on linux
 */
 
-// int	main(void)
-// {
-// 	int	fd[2];
-// 	int	pid1;
-// 	int	pid2;
+int	main(void)
+{
+	int	fd[2];
+	int	pid1;
+	int	pid2;
 
-// 	if (pipe(fd) < 0)
-// 		return (1);
+	if (pipe(fd) < 0)
+		return (1);
 	
-// 	pid1 = fork();
-// 	if (pid1 < 0)
-// 		return (2);
-// 	if (pid1 == 0)
-// 	{
-// 		dup2(fd[1], STDOUT_FILENO);
-// 		close(fd[0]);
-// 		close(fd[1]);
-// 		execlp("ping", "ping", "-c", "5", "google.com", NULL);
-// 	}
-// 	pid2 = fork();
-// 	if (pid2 < 0)
-// 		return (3);
-// 	if (pid2 == 0)
-// 	{
-// 		dup2(fd[0], STDIN_FILENO);
-// 		close(fd[0]);
-// 		close(fd[1]);
-// 		execlp("grep", "grep", "round", NULL);
-// 	}
-// 	// close fd of main 
-// 	close(fd[0]);
-// 	close(fd[1]);
-// 	// since we do 2 fork, we have to wait for the processes separately
-// 	waitpid(pid1, NULL, 0);
-// 	waitpid(pid2, NULL, 0);
-// 	return (0);
+	pid1 = fork();
+	if (pid1 < 0)
+		return (2);
+	if (pid1 == 0)
+	{
+		//child process 1
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		execlp("ping", "ping", "-c", "5", "google.com", NULL);
+	}
+	pid2 = fork();
+	if (pid2 < 0)
+		return (3);
+	if (pid2 == 0)
+	{
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		execlp("grep", "grep", "round", NULL);
+	}
+	// close fd of main 
+	close(fd[0]);
+	close(fd[1]);
+	// since we do 2 fork, we have to wait for the processes separately
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, NULL, 0);
+	return (0);
 	
-// }
+}
