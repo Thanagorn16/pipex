@@ -8,7 +8,7 @@
 // int	main(void) // this function is to show how fork works
 // {
 // 	int	id;
-	
+
 // 	id = fork();
 // 	if (id != 0)
 // 		fork();
@@ -54,7 +54,7 @@
 // 		sleep(1);
 // 	printf("current id: %d, parent id: %d\n", getpid(), getppid());
 
-// 	int res = wait(NULL); 
+// 	int res = wait(NULL);
 // 	if (res == -1) //* -1 = no child process. Thus, this will be printed if it's the main process
 // 		printf("no children to wait for\n");
 // 	else
@@ -107,7 +107,7 @@
 // 		printf("Got from child process %d\n", y);
 // 	}
 // 	return 0;
-	
+
 // }
 
 
@@ -117,7 +117,7 @@
 
 // int	main(void)
 // {
-// 	// * 2 pips are 
+// 	// * 2 pips are
 // 	//! we can't have pipe that receives and sends data on the same process needed for storing the data of read and write
 // 	//! that means we need 2 pipes.
 //	// ! by doing this, the processes won't interupt each other and the result won't be messy
@@ -132,7 +132,7 @@
 // 	if (pid == 0)
 // 	{
 // 		// child process
-// 		close(p1[0]); //! we have to close some pipes if they are not used so that we won't have too many of them 
+// 		close(p1[0]); //! we have to close some pipes if they are not used so that we won't have too many of them
 // 		close(p2[1]);
 // 		int x;
 // 		if (read(p2[0], &x, sizeof(x)) == -1) { return 3; }
@@ -176,7 +176,7 @@
 // 	int	pid = fork();
 // 	if (pid == -1)
 // 		return 2;
-	
+
 // 	if (pid == 0)
 // 	{
 // 		// child process
@@ -229,7 +229,7 @@
 // int	main(void)
 // {
 // 	int	fd[2];
-	
+
 // 	if (pipe(fd) == -1)
 // 		return (1);
 // 	int	pid = fork();
@@ -272,42 +272,42 @@
 * Simulating pipe on linux
 */
 
-int	main(void)
-{
-	int	fd[2];
-	int	pid1;
-	int	pid2;
+// int	main(void)
+// {
+// 	int	fd[2];
+// 	int	pid1;
+// 	int	pid2;
 
-	if (pipe(fd) < 0)
-		return (1);
-	
-	pid1 = fork();
-	if (pid1 < 0)
-		return (2);
-	if (pid1 == 0)
-	{
-		//child process 1
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		execlp("ping", "ping", "-c", "5", "google.com", NULL);
-	}
-	pid2 = fork();
-	if (pid2 < 0)
-		return (3);
-	if (pid2 == 0)
-	{
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		execlp("grep", "grep", "round", NULL);
-	}
-	// close fd of main 
-	close(fd[0]);
-	close(fd[1]);
-	// since we do 2 fork, we have to wait for the processes separately
-	waitpid(pid1, NULL, 0);
-	waitpid(pid2, NULL, 0);
-	return (0);
-	
-}
+// 	if (pipe(fd) < 0)
+// 		return (1);
+
+// 	pid1 = fork();
+// 	if (pid1 < 0)
+// 		return (2);
+// 	if (pid1 == 0)
+// 	{
+// 		//child process 1
+// 		dup2(fd[1], STDOUT_FILENO);
+// 		close(fd[0]);
+// 		close(fd[1]);
+// 		execlp("ping", "ping", "-c", "5", "google.com", NULL);
+// 	}
+// 	pid2 = fork();
+// 	if (pid2 < 0)
+// 		return (3);
+// 	if (pid2 == 0)
+// 	{
+// 		dup2(fd[0], STDIN_FILENO);
+// 		close(fd[0]);
+// 		close(fd[1]);
+// 		execlp("grep", "grep", "round", NULL);
+// 	}
+// 	// close fd of main
+// 	close(fd[0]);
+// 	close(fd[1]);
+// 	// since we do 2 fork, we have to wait for the processes separately
+// 	waitpid(pid1, NULL, 0);
+// 	waitpid(pid2, NULL, 0);
+// 	return (0);
+
+// }

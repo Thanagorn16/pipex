@@ -1,4 +1,4 @@
-#include "pipex.h"
+#include "libft.h"
 
 int	check_inset(char c, char const *set)
 {

@@ -1,4 +1,4 @@
-#include "pipex.h"
+#include "libft.h"
 
 char	**get_mal(char const *s, char c)
 {
