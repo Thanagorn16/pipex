@@ -7,13 +7,16 @@
 #include <fcntl.h>
 #include "libft/libft.h"
 
-// size_t	ft_strlen(const char *str);
-// char	**ft_split(char const *s, char c);
-// char	*ft_strdup(const char *str);
-// char	*ft_strtrim(char const *str, char const *set);
-// char	*ft_strjoin_path(char const *str1, char const *str2);
+#define	ERR_ARGS 1
+#define	ERR_PIPE 2
+#define	ERR_FORK 3
+#define	ERR_FILE 4
+#define	ERR_EXEC 5
+
 
 char	**find_path(char **envp, char **av);
 int		child_process(int fd[], char **av, char **path_env, char **envp);
+int		parent_process(int fd[], char **av, char **path_env, char **envp);
+void	is_err(int err);
 
 #endif

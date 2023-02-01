@@ -18,7 +18,8 @@ LIBFT_PATH = libft/
 
 PIPE_SRCS = ft_pipex.c pipex_utils.c
 
-LIBFT_SRCS = ft_strlen.c ft_strjoin_path.c ft_split.c ft_strtrim.c
+LIBFT_SRCS = ft_strlen.c ft_strjoin_path.c ft_split.c ft_strtrim.c \
+			ft_putstr_fd.c
 
 SRCS = $(PIPE_SRCS) $(addprefix $(LIBFT_PATH), $(LIBFT_SRCS))
 

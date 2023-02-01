@@ -1,5 +1,15 @@
 #include "libft.h"
 
+void	free_malloc(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+		free(arr[i++]);
+	free(arr);
+}
+
 char	**get_mal(char const *s, char c)
 {
 	int		slot;
@@ -23,6 +33,8 @@ char	**get_mal(char const *s, char c)
 	else
 		slot = 1;
 	arr = (char **) malloc(slot * sizeof(char *));
+	if (!arr)
+		return (NULL);
 	return (arr);
 }
 
@@ -71,7 +83,12 @@ char	**allocate(char const *s, char c, char **arr)
 		}
 		if (count > 0)
 		{
-			arr[slot] = (char *) malloc(count + 1);
+			arr[slot] = (char *) malloc(count + 1); // malloc word
+			if (!arr[slot])
+			{
+				free_malloc(arr);
+				return (NULL);
+			}
 			slot++;
 			count = 0;
 		}
