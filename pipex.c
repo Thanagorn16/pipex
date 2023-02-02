@@ -33,6 +33,14 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	close(fd[0]);
 	close(fd[1]);
 	cmd = ft_split(av[2], ' '); // split command (av[2]) from argument
+	if (access(av[2], F_OK) == 0)
+		execve(av[2], cmd, envp);
+	if (ft_strncmp(av[2], "/bin", 4) == 0 && access(av[2], F_OK) == -1)
+	{
+		free_malloc(path_env);
+		free_malloc(cmd);
+		is_err(ERR_FILE, av[2]);
+	}
 	i = 0;
 	while (path_env[i]) // joint path with '/'
 	{
@@ -69,7 +77,15 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	close(outfile);
 	close(fd[1]);
 	close(fd[0]);
-	cmd = ft_split(av[3], ' ');
+	cmd = ft_split(av[3], ' '); // cmd = {cmd1, cmd2, NULL}
+	if (access(av[3], F_OK) == 0)
+		execve(av[3], cmd, envp);
+	if (ft_strncmp(av[3], "/bin", 4) == 0 && access(av[3], F_OK) == -1)
+	{
+		free_malloc(path_env);
+		free_malloc(cmd);
+		is_err(ERR_FILE, av[3]);
+	}
 	i = 0;
 	while (path_env[i])
 	{
@@ -121,5 +137,5 @@ int	main(int ac, char **av, char **envp)
 		if (parent == 5)
 			is_err(ERR_EXEC, av[3]);
 	}
-	wait(NULL);
+	wait(NULL); // wait here as there's some case that child process need the data from parent process
 }

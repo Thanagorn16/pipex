@@ -11,5 +11,6 @@ char	*ft_strtrim(char const *str, char const *set);
 char	*ft_strdup(const char *str);
 char	*ft_strjoin_path(char const *str1, char const *str2);
 void	ft_putstr_fd(char *s, int fd);
+int		ft_strncmp(const char *str1, const char *str2, size_t n);
 
 #endif

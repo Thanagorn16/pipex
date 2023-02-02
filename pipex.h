@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include "libft/libft.h"
+#include <sys/errno.h>
 
 #define	ERR_ARGS 1
 #define	ERR_PIPE 2
