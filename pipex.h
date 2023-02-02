@@ -14,9 +14,9 @@
 #define	ERR_EXEC 5
 
 
-char	**find_path(char **envp, char **av);
+char	**find_path(char **envp);
 int		child_process(int fd[], char **av, char **path_env, char **envp);
 int		parent_process(int fd[], char **av, char **path_env, char **envp);
-void	is_err(int err);
+void	is_err(int err, char *av);
 
 #endif

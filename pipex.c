@@ -1,11 +1,9 @@
 #include "pipex.h"
 
-char	**find_path(char **envp, char **av)
+char	**find_path(char **envp)
 {
 	int	i;
-	char	*path;
 	char	**path_env;
-	char	**cmd;
 
 	i = 0;
 	while (envp[i]) // get the path index
@@ -28,7 +26,7 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 
 	infile = open(av[1], O_RDONLY);
 	if (infile < 0)
-		is_err(ERR_FILE);
+		is_err(ERR_FILE, av[1]);
 	dup2(infile, STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
 	close(infile);
@@ -65,7 +63,7 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 
 	outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (outfile < 0)
-		is_err(ERR_FILE);
+		is_err(ERR_FILE, av[4]);
 	dup2(outfile, STDOUT_FILENO);
 	dup2(fd[0], STDIN_FILENO);
 	close(outfile);
@@ -97,32 +95,31 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 int	main(int ac, char **av, char **envp)
 {
 	char	**path_env;
-	char	**cmd;
 	int		fd[2]; // pipe
 	int		pid;
 	int		child;
 	int		parent;
 
 	if (ac != 5)
-		is_err(ERR_ARGS);
-	path_env = find_path(envp, av);
+		is_err(ERR_ARGS, NULL);
+	path_env = find_path(envp);
 	if (pipe(fd) < 0)
-		is_err(ERR_PIPE);
+		is_err(ERR_PIPE, NULL);
 	pid = fork();
 	if (pid < 0)
-		is_err(ERR_FORK);
+		is_err(ERR_FORK, NULL);
 	if (pid == 0)
 	{
 		child = child_process(fd, av, path_env, envp);
 		if (child == 5)
-			is_err(ERR_EXEC);
+			is_err(ERR_EXEC, av[2]);
 	}
 	else
 	{
-		wait(NULL);
+		// wait(NULL);
 		parent = parent_process(fd, av, path_env, envp);
 		if (parent == 5)
-			is_err(ERR_EXEC);
+			is_err(ERR_EXEC, av[3]);
 	}
-	// wait(NULL);
+	wait(NULL);
 }
