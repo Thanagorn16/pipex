@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: truangsi <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/03 16:14:59 by truangsi          #+#    #+#             */
+/*   Updated: 2023/02/03 16:15:01 by truangsi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 char	**find_path(char **envp)
 {
-	int	i;
+	int		i;
 	char	**path_env;
 
 	i = 0;
@@ -23,7 +35,6 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	int		infile;
 	char	**cmd;
 	char	*str;
-	int		i;
 
 	infile = open(av[1], O_RDONLY);
 	if (infile < 0)
@@ -36,40 +47,20 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	cmd = ft_split(av[2], ' '); // split command (av[2]) from argument
 	if (access(av[2], F_OK) == 0)
 		execve(av[2], cmd, envp);
-	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1)
+	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1) // if path also comes together with the command
 	{
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		// is_err(ERR_FILE, av[2]);
 		is_err(ERR_FILE, str);
 	}
-	i = 0;
-	while (path_env[i]) // joint path with '/'
-	{
-		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]);
-		i++;
-	}
-	i = 0;
-	while (path_env[i])
-	{
-		if (access(path_env[i], F_OK) == -1)
-			i++;
-		else // if the file exist, break
-			break ;
-	}
-	if (execve(path_env[i], cmd, envp) == -1)
-	{
-		free_malloc(path_env);
-		free_malloc(cmd);
-	}
+	do_exec(path_env, cmd, envp);
 	return (ERR_EXEC); // fail to execute
 }
 
 int	parent_process(int fd[], char **av, char **path_env, char **envp)
 {
-	int	outfile;
-	int	i;
+	int		outfile;
 	char	**cmd;
 	char	*str;
 
@@ -89,28 +80,9 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		// is_err(ERR_FILE, av[3]);
 		is_err(ERR_FILE, str);
 	}
-	i = 0;
-	while (path_env[i])
-	{
-		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]);
-		i++;
-	}
-	i = 0;
-	while (path_env[i])
-	{
-		if (access(path_env[i], F_OK) == -1)
-			i++;
-		else
-			break ;
-	}
-	if (execve(path_env[i], cmd, envp) == -1)
-	{
-		free_malloc(path_env);
-		free_malloc(cmd);
-	}
+	do_exec(path_env, cmd, envp);
 	return (ERR_EXEC); // fail to execute
 }
 
@@ -138,7 +110,6 @@ int	main(int ac, char **av, char **envp)
 	}
 	else
 	{
-		// wait(NULL);
 		parent = parent_process(fd, av, path_env, envp);
 		if (parent == 5)
 			is_err(ERR_EXEC, av[3]);
