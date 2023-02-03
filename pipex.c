@@ -18,16 +18,16 @@ char	**find_path(char **envp)
 	char	**path_env;
 
 	i = 0;
-	while (envp[i]) // get the path index
+	while (envp[i])
 	{
 		if (envp[i][0] == 'P' && envp[i][1] == 'A'
 			&& envp[i][2] == 'T' && envp[i][3] == 'H')
-			break;
+			break ;
 		i++;
 	}
-	path_env = ft_split(envp[i], ':'); // split them with :
-	path_env[0] = ft_strtrim(path_env[0], "PATH="); // trim PATH=
-	return (path_env); // return path without '/ to command'
+	path_env = ft_split(envp[i], ':');
+	path_env[0] = ft_strtrim(path_env[0], "PATH=");
+	return (path_env);
 }
 
 int	child_process(int fd[], char **av, char **path_env, char **envp)
@@ -44,10 +44,10 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	close(infile);
 	close(fd[0]);
 	close(fd[1]);
-	cmd = ft_split(av[2], ' '); // split command (av[2]) from argument
+	cmd = ft_split(av[2], ' ');
 	if (access(av[2], F_OK) == 0)
 		execve(av[2], cmd, envp);
-	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1) // if path also comes together with the command
+	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1)
 	{
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
@@ -55,7 +55,7 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 		is_err(ERR_FILE, str);
 	}
 	do_exec(path_env, cmd, envp);
-	return (ERR_EXEC); // fail to execute
+	return (ERR_EXEC);
 }
 
 int	parent_process(int fd[], char **av, char **path_env, char **envp)
@@ -72,7 +72,7 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	close(outfile);
 	close(fd[1]);
 	close(fd[0]);
-	cmd = ft_split(av[3], ' '); // cmd = {cmd1, cmd2, NULL}
+	cmd = ft_split(av[3], ' ');
 	if (access(av[3], F_OK) == 0)
 		execve(av[3], cmd, envp);
 	if (ft_strncmp(av[3], "/", 1) == 0 && access(av[3], F_OK) == -1)
@@ -83,36 +83,32 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 		is_err(ERR_FILE, str);
 	}
 	do_exec(path_env, cmd, envp);
-	return (ERR_EXEC); // fail to execute
+	return (ERR_EXEC);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	char	**path_env;
-	int		fd[2]; // pipe
-	int		pid;
-	int		child;
-	int		parent;
+	t_pipe	pipex;
 
 	if (ac != 5)
 		is_err(ERR_ARGS, NULL);
-	path_env = find_path(envp);
-	if (pipe(fd) < 0)
+	pipex.path_env = find_path(envp);
+	if (pipe(pipex.fd) < 0)
 		is_err(ERR_PIPE, NULL);
-	pid = fork();
-	if (pid < 0)
+	pipex.pid = fork();
+	if (pipex.pid < 0)
 		is_err(ERR_FORK, NULL);
-	if (pid == 0)
+	if (pipex.pid == 0)
 	{
-		child = child_process(fd, av, path_env, envp);
-		if (child == 5)
+		pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
+		if (pipex.child == 5)
 			is_err(ERR_EXEC, av[2]);
 	}
 	else
 	{
-		parent = parent_process(fd, av, path_env, envp);
-		if (parent == 5)
+		pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
+		if (pipex.parent == 5)
 			is_err(ERR_EXEC, av[3]);
 	}
-	wait(NULL); // wait here as there's some case that child process need the data from parent process
+	wait(NULL);
 }

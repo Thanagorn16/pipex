@@ -10,22 +10,30 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX
-#define PIPEX
+#ifndef PIPEX_H
+# define PIPEX_H
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include "libft/libft.h"
-#include <sys/errno.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include "libft/libft.h"
+# include <sys/errno.h>
 
-#define	ERR_ARGS 1
-#define	ERR_PIPE 2
-#define	ERR_FORK 3
-#define	ERR_FILE 4
-#define	ERR_EXEC 5
+# define ERR_ARGS 1
+# define ERR_PIPE 2
+# define ERR_FORK 3
+# define ERR_FILE 4
+# define ERR_EXEC 5
 
+typedef struct s_pipe
+{
+	char	**path_env;
+	int		fd[2];
+	int		pid;
+	int		child;
+	int		parent;
+}	t_pipe;
 
 char	**find_path(char **envp);
 int		child_process(int fd[], char **av, char **path_env, char **envp);

@@ -79,34 +79,29 @@ char	**insert(char const *s, char c, int slot, char **arr)
 
 char	**allocate(char const *s, char c, char **arr)
 {
-	int		count;
-	int		slot;
-	size_t	i;
+	t_split	split;
 
-	i = 0;
-	count = 0;
-	slot = 0;
-	while (i < ft_strlen(s))
+	split.i = 0;
+	split.count = 0;
+	split.slot = 0;
+	while (split.i < ft_strlen(s))
 	{
-		while (s[i] != c && s[i] != '\0')
+		while (s[split.i] != c && s[split.i] != '\0')
 		{
-			i++;
-			count++;
+			split.i++;
+			split.count++;
 		}
-		if (count > 0)
+		if (split.count > 0)
 		{
-			arr[slot] = (char *) malloc(count + 1); // malloc word
-			if (!arr[slot])
-			{
-				free_malloc(arr);
-				return (NULL);
-			}
-			slot++;
-			count = 0;
+			arr[split.slot] = (char *) malloc(split.count + 1);
+			if (!arr[split.slot])
+				return (free_malloc(arr), NULL);
+			split.slot++;
+			split.count = 0;
 		}
-		i++;
+		split.i++;
 	}
-	arr = insert(s, c, slot, arr);
+	arr = insert(s, c, split.slot, arr);
 	return (arr);
 }
 

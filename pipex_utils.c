@@ -56,7 +56,7 @@ void	do_exec(char **path_env, char **cmd, char **envp)
 	int	i;
 
 	i = 0;
-	while (path_env[i]) // joint path with '/'
+	while (path_env[i])
 	{
 		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]);
 		i++;
@@ -66,7 +66,7 @@ void	do_exec(char **path_env, char **cmd, char **envp)
 	{
 		if (access(path_env[i], F_OK) == -1)
 			i++;
-		else // if the file exist, break
+		else
 			break ;
 	}
 	if (execve(path_env[i], cmd, envp) == -1)
