@@ -22,6 +22,7 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 {
 	int		infile;
 	char	**cmd;
+	char	*str;
 	int		i;
 
 	infile = open(av[1], O_RDONLY);
@@ -35,11 +36,13 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	cmd = ft_split(av[2], ' '); // split command (av[2]) from argument
 	if (access(av[2], F_OK) == 0)
 		execve(av[2], cmd, envp);
-	if (ft_strncmp(av[2], "/bin", 4) == 0 && access(av[2], F_OK) == -1)
+	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1)
 	{
+		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		is_err(ERR_FILE, av[2]);
+		// is_err(ERR_FILE, av[2]);
+		is_err(ERR_FILE, str);
 	}
 	i = 0;
 	while (path_env[i]) // joint path with '/'
@@ -68,6 +71,7 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	int	outfile;
 	int	i;
 	char	**cmd;
+	char	*str;
 
 	outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (outfile < 0)
@@ -80,11 +84,13 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	cmd = ft_split(av[3], ' '); // cmd = {cmd1, cmd2, NULL}
 	if (access(av[3], F_OK) == 0)
 		execve(av[3], cmd, envp);
-	if (ft_strncmp(av[3], "/bin", 4) == 0 && access(av[3], F_OK) == -1)
+	if (ft_strncmp(av[3], "/", 1) == 0 && access(av[3], F_OK) == -1)
 	{
+		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		is_err(ERR_FILE, av[3]);
+		// is_err(ERR_FILE, av[3]);
+		is_err(ERR_FILE, str);
 	}
 	i = 0;
 	while (path_env[i])
