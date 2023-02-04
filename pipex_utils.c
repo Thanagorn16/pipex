@@ -54,11 +54,16 @@ void	is_err(int err, char *av)
 void	do_exec(char **path_env, char **cmd, char **envp)
 {
 	int	i;
+	char	*old_path;
+	char	*path_cmd;
 
 	i = 0;
+	path_cmd = NULL;
 	while (path_env[i])
 	{
-		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]);
+		old_path = path_env[i]; // new pointer to the old path
+		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]); //get new path that join with command
+		free(old_path); // free the old path (thos that are not linked with the cmd)
 		i++;
 	}
 	i = 0;
@@ -66,12 +71,17 @@ void	do_exec(char **path_env, char **cmd, char **envp)
 	{
 		if (access(path_env[i], F_OK) == -1)
 			i++;
-		else
+		else // if not else, path_cmd = NULL
+		{
+			path_cmd = ft_strdup(path_env[i]);
+			free_malloc(path_env);
 			break ;
+		}
 	}
-	if (execve(path_env[i], cmd, envp) == -1)
-	{
-		free_malloc(path_env);
-		free_malloc(cmd);
-	}
+	execve(path_cmd, cmd, envp);
+	free(path_cmd);
+	// if (execve(path_cmd, cmd, envp) == -1)
+	// {
+	// 	free_malloc(cmd);
+	// }
 }

@@ -16,6 +16,7 @@ char	**find_path(char **envp)
 {
 	int		i;
 	char	**path_env;
+	char	*tmp;
 
 	i = 0;
 	while (envp[i])
@@ -25,8 +26,9 @@ char	**find_path(char **envp)
 			break ;
 		i++;
 	}
-	path_env = ft_split(envp[i], ':');
-	path_env[0] = ft_strtrim(path_env[0], "PATH=");
+	tmp = ft_strtrim(envp[i], "PATH=");
+	path_env = ft_split(tmp, ':');
+	free(tmp);
 	return (path_env);
 }
 
@@ -55,6 +57,8 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 		is_err(ERR_FILE, str);
 	}
 	do_exec(path_env, cmd, envp);
+	free_malloc(path_env);
+	free_malloc(cmd);
 	return (ERR_EXEC);
 }
 
@@ -83,6 +87,7 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 		is_err(ERR_FILE, str);
 	}
 	do_exec(path_env, cmd, envp);
+	// free_malloc(path_env);
 	return (ERR_EXEC);
 }
 
@@ -101,14 +106,17 @@ int	main(int ac, char **av, char **envp)
 	if (pipex.pid == 0)
 	{
 		pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
+		// free_malloc(pipex.path_env);
 		if (pipex.child == 5)
 			is_err(ERR_EXEC, av[2]);
 	}
 	else
 	{
+		// free_malloc(pipex.path_env);
+		// exit(0);
 		pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
+		wait(NULL);
 		if (pipex.parent == 5)
 			is_err(ERR_EXEC, av[3]);
 	}
-	wait(NULL);
 }
