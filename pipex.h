@@ -25,14 +25,17 @@
 # define ERR_FORK 3
 # define ERR_FILE 4
 # define ERR_EXEC 5
+# define ERR_FILE_CMD 6
 
 typedef struct s_pipe
 {
 	char	**path_env;
 	int		fd[2];
-	int		pid;
+	int		pid1;
+	int		pid2;
 	int		child;
 	int		parent;
+	int		status;
 }	t_pipe;
 
 char	**find_path(char **envp);

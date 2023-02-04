@@ -48,6 +48,16 @@ void	is_err(int err, char *av)
 		zhs_err(err, av);
 	else if (err == 5)
 		zhs_err(err, av);
+	else if (err == 6)
+	{
+		ft_putstr_fd("zsh: no such file or directory: ", STDERR_FILENO);
+		ft_putstr_fd(av, STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+		errno = 1;
+		if (av[0] == '/')
+			errno = 127;
+		free(av);
+	}
 	exit(errno);
 }
 
@@ -80,8 +90,4 @@ void	do_exec(char **path_env, char **cmd, char **envp)
 	}
 	execve(path_cmd, cmd, envp);
 	free(path_cmd);
-	// if (execve(path_cmd, cmd, envp) == -1)
-	// {
-	// 	free_malloc(cmd);
-	// }
 }

@@ -54,7 +54,7 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		is_err(ERR_FILE, str);
+		is_err(ERR_FILE_CMD, str);
 	}
 	do_exec(path_env, cmd, envp);
 	free_malloc(path_env);
@@ -67,10 +67,17 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	int		outfile;
 	char	**cmd;
 	char	*str;
+	int		i;
 
+	i = 0;
 	outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (outfile < 0)
+	{
+		i = 100000;
+		while (i)
+			i--;
 		is_err(ERR_FILE, av[4]);
+	}
 	dup2(outfile, STDOUT_FILENO);
 	dup2(fd[0], STDIN_FILENO);
 	close(outfile);
@@ -84,10 +91,11 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
 		free_malloc(cmd);
-		is_err(ERR_FILE, str);
+		is_err(ERR_FILE_CMD, str);
 	}
 	do_exec(path_env, cmd, envp);
-	// free_malloc(path_env);
+	free_malloc(path_env);
+	free_malloc(cmd);
 	return (ERR_EXEC);
 }
 
@@ -100,23 +108,30 @@ int	main(int ac, char **av, char **envp)
 	pipex.path_env = find_path(envp);
 	if (pipe(pipex.fd) < 0)
 		is_err(ERR_PIPE, NULL);
-	pipex.pid = fork();
-	if (pipex.pid < 0)
+	pipex.pid1 = fork();
+	if (pipex.pid1 < 0)
 		is_err(ERR_FORK, NULL);
-	if (pipex.pid == 0)
+	if (pipex.pid1 == 0)
 	{
-		pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
-		// free_malloc(pipex.path_env);
-		if (pipex.child == 5)
-			is_err(ERR_EXEC, av[2]);
+		// pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
+		child_process(pipex.fd, av, pipex.path_env, envp);
+		// if (pipex.child == 5)
+		is_err(ERR_EXEC, av[2]);
 	}
-	else
+	pipex.pid2 = fork();
+	if (pipex.pid2 < 0)
+		is_err(ERR_FORK, NULL);
+	if (pipex.pid2 == 0)
 	{
-		// free_malloc(pipex.path_env);
-		// exit(0);
-		pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
-		wait(NULL);
-		if (pipex.parent == 5)
-			is_err(ERR_EXEC, av[3]);
+		// pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
+		parent_process(pipex.fd, av, pipex.path_env, envp);
+		// if (pipex.parent == 5)
+		is_err(ERR_EXEC, av[3]);
 	}
+	close(pipex.fd[0]);
+	close(pipex.fd[1]);
+	waitpid(pipex.pid1, &pipex.status, 0);
+	waitpid(pipex.pid2, &pipex.status, 0);
+	free_malloc(pipex.path_env);
+	return (WEXITSTATUS(pipex.status));
 }
