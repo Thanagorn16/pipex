@@ -32,7 +32,7 @@ char	**find_path(char **envp)
 	return (path_env);
 }
 
-int	child_process(int fd[], char **av, char **path_env, char **envp)
+int	child_process_a(int fd[], char **av, char **path_env, char **envp)
 {
 	int		infile;
 	char	**cmd;
@@ -47,9 +47,9 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	close(fd[0]);
 	close(fd[1]);
 	cmd = ft_split(av[2], ' ');
-	if (access(av[2], F_OK) == 0)
-		execve(av[2], cmd, envp);
-	if (ft_strncmp(av[2], "/", 1) == 0 && access(av[2], F_OK) == -1)
+	if (access(cmd[0], F_OK) == 0)
+		execve(cmd[0], cmd, envp);
+	if (ft_strncmp(av[2], "/", 1) == 0 && access(cmd[0], F_OK) == -1)
 	{
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
@@ -62,20 +62,20 @@ int	child_process(int fd[], char **av, char **path_env, char **envp)
 	return (ERR_EXEC);
 }
 
-int	parent_process(int fd[], char **av, char **path_env, char **envp)
+int	child_process_b(int fd[], char **av, char **path_env, char **envp)
 {
 	int		outfile;
 	char	**cmd;
 	char	*str;
-	int		i;
+	// int		i;
 
-	i = 0;
+	// i = 0;
 	outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (outfile < 0)
 	{
-		i = 100000;
-		while (i)
-			i--;
+		// i = 100000;
+		// while (i)
+		// 	i--;
 		is_err(ERR_FILE, av[4]);
 	}
 	dup2(outfile, STDOUT_FILENO);
@@ -84,9 +84,9 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 	close(fd[1]);
 	close(fd[0]);
 	cmd = ft_split(av[3], ' ');
-	if (access(av[3], F_OK) == 0)
-		execve(av[3], cmd, envp);
-	if (ft_strncmp(av[3], "/", 1) == 0 && access(av[3], F_OK) == -1)
+	if (access(cmd[0], F_OK) == 0)
+		execve(cmd[0], cmd, envp);
+	if (ft_strncmp(av[3], "/", 1) == 0 && access(cmd[0], F_OK) == -1)
 	{
 		str = ft_strdup(cmd[0]);
 		free_malloc(path_env);
@@ -102,6 +102,7 @@ int	parent_process(int fd[], char **av, char **path_env, char **envp)
 int	main(int ac, char **av, char **envp)
 {
 	t_pipe	pipex;
+	char	**err_cmd;
 
 	if (ac != 5)
 		is_err(ERR_ARGS, NULL);
@@ -114,9 +115,10 @@ int	main(int ac, char **av, char **envp)
 	if (pipex.pid1 == 0)
 	{
 		// pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
-		child_process(pipex.fd, av, pipex.path_env, envp);
+		child_process_a(pipex.fd, av, pipex.path_env, envp);
 		// if (pipex.child == 5)
-		is_err(ERR_EXEC, av[2]);
+		err_cmd = ft_split(av[2], ' '); // don't forget to free the 2 dimensional array here
+		is_err(ERR_EXEC, err_cmd[0]);
 	}
 	pipex.pid2 = fork();
 	if (pipex.pid2 < 0)
@@ -124,14 +126,15 @@ int	main(int ac, char **av, char **envp)
 	if (pipex.pid2 == 0)
 	{
 		// pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
-		parent_process(pipex.fd, av, pipex.path_env, envp);
+		child_process_b(pipex.fd, av, pipex.path_env, envp);
 		// if (pipex.parent == 5)
-		is_err(ERR_EXEC, av[3]);
+		err_cmd = ft_split(av[3], ' '); // don't forget to free the 2 dimensional array here
+		is_err(ERR_EXEC, err_cmd[0]);
 	}
 	close(pipex.fd[0]);
 	close(pipex.fd[1]);
-	waitpid(pipex.pid1, &pipex.status, 0);
-	waitpid(pipex.pid2, &pipex.status, 0);
+	pipex.pid1 = waitpid(pipex.pid1, &pipex.status, 0);
+	pipex.pid2 = waitpid(pipex.pid2, &pipex.status, 0);
 	free_malloc(pipex.path_env);
 	return (WEXITSTATUS(pipex.status));
 }

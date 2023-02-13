@@ -19,6 +19,7 @@
 # include <fcntl.h>
 # include "libft/libft.h"
 # include <sys/errno.h>
+# include <sys/types.h>
 
 # define ERR_ARGS 1
 # define ERR_PIPE 2
@@ -31,16 +32,16 @@ typedef struct s_pipe
 {
 	char	**path_env;
 	int		fd[2];
-	int		pid1;
-	int		pid2;
+	pid_t		pid1;
+	pid_t		pid2;
 	int		child;
 	int		parent;
 	int		status;
 }	t_pipe;
 
 char	**find_path(char **envp);
-int		child_process(int fd[], char **av, char **path_env, char **envp);
-int		parent_process(int fd[], char **av, char **path_env, char **envp);
+int		child_process_a(int fd[], char **av, char **path_env, char **envp);
+int		child_process_b(int fd[], char **av, char **path_env, char **envp);
 void	zhs_err(int err, char *av);
 void	is_err(int err, char *av);
 void	do_exec(char **path_env, char **cmd, char **envp);
