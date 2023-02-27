@@ -63,31 +63,28 @@ void	is_err(int err, char *av)
 
 void	do_exec(char **path_env, char **cmd, char **envp)
 {
-	int	i;
-	char	*old_path;
-	char	*path_cmd;
+	t_pipe	pipex;
 
-	i = 0;
-	path_cmd = NULL;
-	while (path_env[i])
+	pipex.i = 0;
+	pipex.path_cmd = NULL;
+	while (path_env[pipex.i])
 	{
-		old_path = path_env[i]; // new pointer to the old path
-		path_env[i] = ft_strjoin_path(path_env[i], cmd[0]); //get new path that join with command
-		free(old_path); // free the old path (thos that are not linked with the cmd)
-		i++;
+		pipex.old_path = path_env[pipex.i];
+		path_env[pipex.i++] = ft_strjoin_path(path_env[pipex.i], cmd[0]);
+		free(pipex.old_path);
 	}
-	i = 0;
-	while (path_env[i])
+	pipex.i = 0;
+	while (path_env[pipex.i])
 	{
-		if (access(path_env[i], F_OK) == -1)
-			i++;
-		else // if not else, path_cmd = NULL
+		if (access(path_env[pipex.i], F_OK) == -1)
+			pipex.i++;
+		else
 		{
-			path_cmd = ft_strdup(path_env[i]);
+			pipex.path_cmd = ft_strdup(path_env[pipex.i]);
 			free_malloc(path_env);
 			break ;
 		}
 	}
-	execve(path_cmd, cmd, envp);
-	free(path_cmd);
+	execve(pipex.path_cmd, cmd, envp);
+	free(pipex.path_cmd);
 }

@@ -31,16 +31,24 @@
 typedef struct s_pipe
 {
 	char	**path_env;
+	char	**cmd;
+	char	*str;
+	char	*old_path;
+	char	*path_cmd;
+	int		i;
 	int		fd[2];
-	pid_t		pid1;
-	pid_t		pid2;
+	pid_t	pid1;
+	pid_t	pid2;
 	int		child;
 	int		parent;
 	int		status;
+	int		infile;
+	int		outfile;
 }	t_pipe;
 
 char	**find_path(char **envp);
 int		child_process_a(int fd[], char **av, char **path_env, char **envp);
+void	fork_child_b(t_pipe pipex, char **av, char **envp, char **err_cmd);
 int		child_process_b(int fd[], char **av, char **path_env, char **envp);
 void	zhs_err(int err, char *av);
 void	is_err(int err, char *av);
