@@ -67,17 +67,10 @@ int	child_process_b(int fd[], char **av, char **path_env, char **envp)
 	int		outfile;
 	char	**cmd;
 	char	*str;
-	// int		i;
 
-	// i = 0;
 	outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (outfile < 0)
-	{
-		// i = 100000;
-		// while (i)
-		// 	i--;
 		is_err(ERR_FILE, av[4]);
-	}
 	dup2(outfile, STDOUT_FILENO);
 	dup2(fd[0], STDIN_FILENO);
 	close(outfile);
@@ -114,9 +107,7 @@ int	main(int ac, char **av, char **envp)
 		is_err(ERR_FORK, NULL);
 	if (pipex.pid1 == 0)
 	{
-		// pipex.child = child_process(pipex.fd, av, pipex.path_env, envp);
 		child_process_a(pipex.fd, av, pipex.path_env, envp);
-		// if (pipex.child == 5)
 		err_cmd = ft_split(av[2], ' '); // don't forget to free the 2 dimensional array here
 		is_err(ERR_EXEC, err_cmd[0]);
 	}
@@ -125,16 +116,14 @@ int	main(int ac, char **av, char **envp)
 		is_err(ERR_FORK, NULL);
 	if (pipex.pid2 == 0)
 	{
-		// pipex.parent = parent_process(pipex.fd, av, pipex.path_env, envp);
 		child_process_b(pipex.fd, av, pipex.path_env, envp);
-		// if (pipex.parent == 5)
 		err_cmd = ft_split(av[3], ' '); // don't forget to free the 2 dimensional array here
 		is_err(ERR_EXEC, err_cmd[0]);
 	}
 	close(pipex.fd[0]);
 	close(pipex.fd[1]);
-	pipex.pid1 = waitpid(pipex.pid1, &pipex.status, 0);
-	pipex.pid2 = waitpid(pipex.pid2, &pipex.status, 0);
+	waitpid(pipex.pid1, NULL, 0);
+	waitpid(pipex.pid2, &pipex.status, 0);
 	free_malloc(pipex.path_env);
 	return (WEXITSTATUS(pipex.status));
 }
