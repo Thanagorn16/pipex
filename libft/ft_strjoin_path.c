@@ -38,12 +38,8 @@ char	*do_join(char const *str1, char const *str2, char *ptr)
 
 char	*ft_strjoin_path(char const *str1, char const *str2)
 {
-	int		i;
-	int		a;
 	char	*ptr;
 
-	i = 0;
-	a = 0;
 	if (!str1)
 		return (NULL);
 	ptr = (char *) malloc((ft_strlen(str1) + ft_strlen(str2) + 2));
